@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <!-- START libraries & declarations -->
+
+  <link rel="dns-prefetch" href="https://c.amazon-adsystem.com">
+  <link rel="preconnect" href="https://c.amazon-adsystem.com" crossorigin>
+  <script async src="https://c.amazon-adsystem.com/aax2/apstag.js"></script>
+  <script type="didomi/javascript">
+    window.apstag = window.apstag || {
+      init: function() {
+        apstag._Q.push(["i", arguments, (new Date).getTime()])
+      },
+      fetchBids: function() {
+        apstag._Q.push(["f", arguments, (new Date).getTime()])
+      },
+      setDisplayBids: function() {},
+      _Q: []
+    };
+  </script>
+  <!-- END libraries & declarations -->
+
+  <!-- START Wrapper -->
+  <script type="didomi/javascript">
+        apstag.init({
+        pubID: 3500,
+        deals: true
+      });
+
+      var pbjs = pbjs || {};
+      	pbjs.que = pbjs.que || [];
+
+      var adUnit1 = {}
+
+      const customConfigObject = {
+        "buckets": [{
+            "precision": 2, //default is 2 if omitted - means 2.1234 rounded to 2 decimal places = 2.12
+            "max": 9,
+            "increment": 0.01 // from $0 to $9, 1-cent increments
+          },
+          {
+            "max": 12,
+            "increment": 0.05 // from $5 to $8, round down to the previous 5-cent increment
+          },
+          {
+            "max": 40,
+            "increment": 0.5 // from $8 to $40, round down to the previous 50-cent increment
+          }
+        ]
+      };
+
+      function fetchbids() {
+
+        //prebid bids
+        pbjs.que.push(function() {
+          pbjs.addAdUnits(videoAdUnit);
+
+          pbjs.setConfig({
+            /* Or whatever your preferred video cache URL is */
+            mediaTypePriceGranularity: {
+              video: customConfigObject
+            },
+            cache: {
+              url: 'https://prebid.adnxs.com/pbc/v1/cache'
+            }
+          });
+
+          pbjs.requestBids({
+            bidsBackHandler: function(bids) {
+              var videoUrl = pbjs.adServers.dfp.buildVideoUrl({
+                adUnit: videoAdUnit,
+                url: adservertag //vast tag from DFP
+              });
+
+
+              var prebidparamsurl = new URLSearchParams(videoUrl);
+              prebidparams = prebidparamsurl.get('prev_scp')
+
+              if (amznbids) {
+                constructvasturl(prebidparams, amznparams);
+                prebidbids = true
+              } else {
+                prebidbids = true
+              }
+
+
+            }
+          });
+
+          apstag.fetchBids({
+              slots: [{
+                slotID: 'preroll',
+                mediaType: 'video',
+                sizes: [
+                  [640, 390]
+                ],
+                timeout: 5000
+              }]
+            },
+            function(bids) {
+              var amznparams = bids.filter(bid => bid.mediaType === 'video')
+                .map(bid => Object.keys(bid.targeting)
+                  .reduce((acc, key) => `${acc}${separator}${key}${operator}${bid.targeting[key]}`, ''))
+                .join('');
+
+              if (prebidbids) {
+                constructvasturl(prebidparams, amznparams);
+                amaznbids = true
+              } else {
+                amaznbids = true
+              }
+
+            }
+          );
+
+        });
+      }
+
+      function constructvasturl(prebidparams, amznparams) {
+
+        wrapperparams = prebidparams + '&' + amznparams
+
+        if (datalayer.player == 'jw') {
+
+          var vasttag = new URL(vasttag)
+          vasttag.searchParams.set('prev_scp', wrapperparams)
+
+          var vasttag = vasttag.toString()
+
+
+        } else {
+
+          s = wrapperparams.split('&')
+
+          bidderparams = {}
+
+          for (a in s) {
+            console.log(s[a])
+            e = s[a].split('=')
+            bidderparams[e[0]] = e[1]
+          }
+
+
+        }
+      }
+
+  </script>
+  <!-- END Wrapper -->
+</head>
+
+<body>
+
+</body>
+
+</html>
