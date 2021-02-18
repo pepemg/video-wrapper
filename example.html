@@ -24,6 +24,10 @@
 
   <!-- START Wrapper -->
   <script type="didomi/javascript">
+
+    var PREBID_TIMEOUT = 2500
+        SAFE_TIMEOUT = 3000
+
         apstag.init({
         pubID: 3500,
         deals: true
@@ -53,9 +57,15 @@
 
       function fetchbids() {
 
+        //Safety First
+        setTimeout(function() {
+              var window.videowrapper.wrapperdone = true,
+              window.videowrapper.custom_params = {},
+              }, SAFE_TIMEOUT);
+
         //prebid bids
         pbjs.que.push(function() {
-          pbjs.addAdUnits(videoAdUnit);
+          pbjs.addAdUnits(videoAdUnit); //REF1 - Video ad units for each site
 
           pbjs.setConfig({
             /* Or whatever your preferred video cache URL is */
@@ -71,22 +81,22 @@
             bidsBackHandler: function(bids) {
               var videoUrl = pbjs.adServers.dfp.buildVideoUrl({
                 adUnit: videoAdUnit,
-                url: adservertag //vast tag from DFP
+                url: adservertag //REF2 - VAST tag from DFP for each site
               });
-
 
               var prebidparamsurl = new URLSearchParams(videoUrl);
               prebidparams = prebidparamsurl.get('prev_scp')
 
               if (amznbids) {
                 constructvasturl(prebidparams, amznparams);
-                prebidbids = true
+                var prebidbids = true
               } else {
-                prebidbids = true
+                var prebidbids = true
               }
 
+            },
 
-            }
+            timeout: TimeOut
           });
 
           apstag.fetchBids({
@@ -96,7 +106,7 @@
                 sizes: [
                   [640, 390]
                 ],
-                timeout: 5000
+                timeout: 2500
               }]
             },
             function(bids) {
@@ -122,32 +132,23 @@
 
         wrapperparams = prebidparams + '&' + amznparams
 
-        if (datalayer.player == 'jw') {
+        s = wrapperparams.split('&')
 
-          var vasttag = new URL(vasttag)
-          vasttag.searchParams.set('prev_scp', wrapperparams)
+        bidderparams = {}
 
-          var vasttag = vasttag.toString()
-
-
-        } else {
-
-          s = wrapperparams.split('&')
-
-          bidderparams = {}
-
-          for (a in s) {
-            console.log(s[a])
-            e = s[a].split('=')
-            bidderparams[e[0]] = e[1]
-          }
-
-
+        for (a in s) {
+          console.log(s[a])
+          e = s[a].split('=')
+          bidderparams[e[0]] = e[1]
         }
+
+        var window.videowrapper.wrapperdone = true,
+        window.videowrapper.custom_params = bidderparams
       }
 
   </script>
   <!-- END Wrapper -->
+
 </head>
 
 <body>
